@@ -1,11 +1,11 @@
 /**
- * Servicio de Email - Envío de OTP con Resend
+ * Servicio de Email - Envío de OTP con Brevo
  */
 
 const sendOTPEmail = async (email, otp, type = 'login') => {
-    const RESEND_API_KEY = process.env.RESEND_API_KEY;
+    const BREVO_API_KEY = process.env.BREVO_API_KEY;
     
-    if (!RESEND_API_KEY) {
+    if (!BREVO_API_KEY) {
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         console.log('📧 CÓDIGO OTP (modo desarrollo)');
         console.log(`   Email: ${email}`);
@@ -19,17 +19,20 @@ const sendOTPEmail = async (email, otp, type = 'login') => {
         : '🔐 Tu código de acceso - El Marrón de Oficina';
 
     try {
-        const response = await fetch('https://api.resend.com/emails', {
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${RESEND_API_KEY}`,
+                'api-key': BREVO_API_KEY,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                from: 'El Marrón de Oficina <onboarding@resend.dev>',
-                to: email,
+                sender: {
+                    name: 'El Marrón de Oficina',
+                    email: 'manuelcalderon4080@gmail.com'
+                },
+                to: [{ email: email }],
                 subject: subject,
-                html: `
+                htmlContent: `
                     <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
                         <h1 style="color: #ff6b35;">☕ El Marrón de Oficina</h1>
                         <p>Tu código de verificación es:</p>
@@ -47,9 +50,9 @@ const sendOTPEmail = async (email, otp, type = 'login') => {
         
         if (response.ok) {
             console.log(`✅ Email enviado a ${email}`);
-            return { success: true, messageId: data.id };
+            return { success: true, messageId: data.messageId };
         } else {
-            console.error('❌ Error Resend:', data);
+            console.error('❌ Error Brevo:', data);
             throw new Error(data.message || 'Error enviando email');
         }
     } catch (error) {
