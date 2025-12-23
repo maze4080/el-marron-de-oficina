@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Marrón de Oficina 🏢 | Foro Anónimo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent-orange: #ff6b35;
+            --accent-teal: #00c9b7;
+            --accent-purple: #9d4edd;
+            --accent-pink: #ff69b4;
+            --accent-yellow: #ffd23f;
+            --bg-dark: #1a1a2e;
+            --bg-card: #16213e;
+            --text-light: #eee;
+            --text-muted: #aaa;
+            --gradient-80s: linear-gradient(135deg, #ff6b35 0%, #9d4edd 50%, #00c9b7 100%);
+            --gradient-sunset: linear-gradient(180deg, #ff6b35 0%, #ff69b4 100%);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(157, 78, 221, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 107, 53, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 60% 80%, rgba(0, 201, 183, 0.1) 0%, transparent 40%);
+            pointer-events: none; z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none; z-index: 0;
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
+        header { text-align: center; padding: 40px 20px; margin-bottom: 30px; }
+        .logo {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            background: var(--gradient-80s);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase; letter-spacing: -2px; line-height: 1.1;
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+        @keyframes glowPulse {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 107, 53, 0.5)); }
+            50% { filter: drop-shadow(0 0 40px rgba(157, 78, 221, 0.8)); }
+        }
+        .tagline { font-family: 'Space Mono', monospace; font-size: 0.9rem; color: var(--accent-teal); margin-top: 10px; letter-spacing: 2px; }
+        .emoji-bar { font-size: 1.5rem; margin-top: 15px; animation: bounce 2s ease-in-out infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        .user-bar { display: flex; justify-content: flex-end; align-items: center; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .user-badge {
+            background: linear-gradient(135deg, #8b6914 0%, var(--accent-orange) 100%);
+            padding: 8px 20px; border-radius: 50px;
+            font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.9rem;
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+        .user-badge::before { content: '☕'; }
+        .btn {
+            padding: 10px 25px; border: none; border-radius: 50px;
+            font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.3s ease;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-primary { background: var(--gradient-sunset); color: white; box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4); }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 30px rgba(255, 107, 53, 0.6); }
+        .btn-secondary { background: transparent; color: var(--accent-teal); border: 2px solid var(--accent-teal); }
+        .btn-secondary:hover:not(:disabled) { background: var(--accent-teal); color: var(--bg-dark); }
+        .btn-logout { background: transparent; color: var(--text-muted); border: 1px solid var(--text-muted); padding: 8px 15px; font-size: 0.8rem; }
+        .stats-bar { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; flex-wrap: wrap; }
+        .stat { text-align: center; padding: 15px 25px; background: rgba(255, 255, 255, 0.05); border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1); min-width: 120px; }
+        .stat-number { font-family: 'Archivo Black', sans-serif; font-size: 1.8rem; background: var(--gradient-80s); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+        .new-post-section { background: var(--bg-card); border-radius: 20px; padding: 25px; margin-bottom: 30px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); }
+        .new-post-section h3 { font-family: 'Space Mono', monospace; color: var(--accent-yellow); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .new-post-section textarea {
+            width: 100%; min-height: 120px;
+            background: rgba(0, 0, 0, 0.3); border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px; padding: 15px;
+            color: var(--text-light); font-family: 'Nunito', sans-serif; font-size: 1rem;
+            resize: vertical; transition: border-color 0.3s ease;
+        }
+        .new-post-section textarea:focus { outline: none; border-color: var(--accent-orange); }
+        .new-post-section textarea::placeholder { color: var(--text-muted); }
+        .post-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 10px; }
+        .char-count { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--text-muted); }
+        .category-select { padding: 10px 20px; background: rgba(0, 0, 0, 0.3); border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 50px; color: var(--text-light); font-family: 'Nunito', sans-serif; cursor: pointer; }
+        .category-select:focus { outline: none; border-color: var(--accent-purple); }
+        .filter-tabs { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center; }
+        .filter-tab { padding: 10px 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50px; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease; }
+        .filter-tab:hover { background: rgba(255, 255, 255, 0.1); color: var(--text-light); }
+        .filter-tab.active { background: var(--accent-purple); color: white; border-color: var(--accent-purple); }
+        .posts-container { display: flex; flex-direction: column; gap: 20px; }
+        .post { background: var(--bg-card); border-radius: 20px; padding: 25px; border: 1px solid rgba(255, 255, 255, 0.08); transition: all 0.3s ease; animation: slideIn 0.5s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .post:hover { border-color: rgba(255, 107, 53, 0.3); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); }
+        .post-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .post-author { display: flex; align-items: center; gap: 12px; }
+        .author-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--gradient-80s); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3); }
+        .author-info { display: flex; flex-direction: column; }
+        .author-name { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--accent-orange); }
+        .post-time { font-size: 0.8rem; color: var(--text-muted); }
+        .post-category { padding: 5px 15px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .cat-chisme { background: rgba(255, 105, 180, 0.2); color: var(--accent-pink); }
+        .cat-queja { background: rgba(255, 107, 53, 0.2); color: var(--accent-orange); }
+        .cat-humor { background: rgba(255, 210, 63, 0.2); color: var(--accent-yellow); }
+        .cat-consejo { background: rgba(0, 201, 183, 0.2); color: var(--accent-teal); }
+        .cat-random { background: rgba(157, 78, 221, 0.2); color: var(--accent-purple); }
+        .post-content { font-size: 1.05rem; line-height: 1.7; margin-bottom: 20px; white-space: pre-wrap; }
+        .post-footer { display: flex; gap: 20px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.05); flex-wrap: wrap; }
+        .post-action { display: flex; align-items: center; gap: 8px; padding: 8px 15px; background: rgba(255, 255, 255, 0.05); border: none; border-radius: 50px; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease; }
+        .post-action:hover { background: rgba(255, 255, 255, 0.1); color: var(--text-light); }
+        .post-action.liked { background: rgba(255, 107, 53, 0.2); color: var(--accent-orange); }
+        .replies-container { margin-top: 20px; margin-left: 30px; padding-left: 20px; border-left: 3px solid rgba(157, 78, 221, 0.3); }
+        .reply { background: rgba(0, 0, 0, 0.2); border-radius: 15px; padding: 15px; margin-bottom: 10px; }
+        .reply .post-author { margin-bottom: 10px; }
+        .reply .author-avatar { width: 35px; height: 35px; font-size: 0.9rem; }
+        .reply-form { margin-top: 15px; }
+        .reply-form textarea { width: 100%; min-height: 80px; background: rgba(0, 0, 0, 0.3); border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 12px; color: var(--text-light); font-family: 'Nunito', sans-serif; font-size: 0.95rem; resize: vertical; }
+        .reply-form textarea:focus { outline: none; border-color: var(--accent-purple); }
+        .reply-form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--bg-card); border-radius: 25px; padding: 40px; max-width: 450px; width: 100%; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); animation: modalSlide 0.3s ease; position: relative; }
+        @keyframes modalSlide { from { opacity: 0; transform: translateY(-30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .modal h2 { font-family: 'Archivo Black', sans-serif; background: var(--gradient-80s); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 10px; font-size: 1.8rem; }
+        .modal p { color: var(--text-muted); margin-bottom: 25px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-light); }
+        .form-group input { width: 100%; padding: 15px; background: rgba(0, 0, 0, 0.3); border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 12px; color: var(--text-light); font-family: 'Nunito', sans-serif; font-size: 1rem; transition: border-color 0.3s ease; }
+        .form-group input:focus { outline: none; border-color: var(--accent-orange); }
+        .otp-inputs { display: flex; gap: 10px; justify-content: center; }
+        .otp-input { width: 55px; height: 65px; text-align: center; font-family: 'Space Mono', monospace; font-size: 1.5rem; font-weight: 700; background: rgba(0, 0, 0, 0.3); border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 12px; color: var(--accent-teal); }
+        .otp-input:focus { outline: none; border-color: var(--accent-teal); }
+        .modal-actions { display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
+        .modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+        .success-message { text-align: center; padding: 20px; }
+        .success-icon { font-size: 4rem; margin-bottom: 15px; animation: popIn 0.5s ease; }
+        @keyframes popIn { 0% { transform: scale(0); } 70% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .username-reveal { font-family: 'Archivo Black', sans-serif; font-size: 2rem; background: var(--gradient-sunset); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 15px 0; }
+        footer { text-align: center; padding: 40px 20px; margin-top: 50px; border-top: 1px solid rgba(255, 255, 255, 0.05); }
+        footer p { color: var(--text-muted); font-size: 0.85rem; }
+        footer .footer-links { margin-top: 15px; display: flex; justify-content: center; gap: 20px; }
+        footer a { color: var(--accent-teal); text-decoration: none; font-size: 0.85rem; }
+        .loading { display: flex; justify-content: center; padding: 40px; }
+        .spinner { width: 40px; height: 40px; border: 4px solid rgba(255, 255, 255, 0.1); border-top-color: var(--accent-orange); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .logged-out-message { text-align: center; padding: 30px; background: rgba(255, 107, 53, 0.1); border: 1px dashed var(--accent-orange); border-radius: 15px; margin-bottom: 30px; }
+        .logged-out-message p { color: var(--text-light); margin-bottom: 15px; }
+        .toast { position: fixed; bottom: 30px; right: 30px; padding: 15px 25px; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--accent-teal); color: var(--text-light); font-weight: 600; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4); transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 2000; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.error { border-color: #ff4757; }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+        .empty-state-icon { font-size: 4rem; margin-bottom: 20px; }
+        .load-more { text-align: center; padding: 20px; }
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            header { padding: 25px 15px; }
+            .post { padding: 20px; }
+            .replies-container { margin-left: 15px; padding-left: 15px; }
+            .modal { padding: 25px; }
+            .otp-input { width: 45px; height: 55px; font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="logo">El Marrón<br>de Oficina</h1>
+            <p class="tagline">// Donde el café sabe a verdad //</p>
+            <div class="emoji-bar">☕ 🏢 📋 💼 🖥️ 😤 🎉</div>
+        </header>
+
+        <div class="user-bar" id="userBar"></div>
+
+        <div class="stats-bar">
+            <div class="stat"><div class="stat-number" id="totalPosts">0</div><div class="stat-label">Marrones</div></div>
+            <div class="stat"><div class="stat-number" id="totalUsers">0</div><div class="stat-label">Marrones Activos</div></div>
+            <div class="stat"><div class="stat-number" id="totalReplies">0</div><div class="stat-label">Respuestas</div></div>
+        </div>
+
+        <div class="new-post-section" id="newPostSection" style="display: none;">
+            <h3>📝 Comparte tu marrón</h3>
+            <textarea id="newPostContent" placeholder="¿Qué pasó hoy en la oficina? Cuéntanos ese chisme, esa queja, o esa historia que tienes que soltar..." maxlength="2000"></textarea>
+            <div class="post-actions">
+                <span class="char-count"><span id="charCount">0</span>/2000</span>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <select class="category-select" id="postCategory">
+                        <option value="random">🎲 Random</option>
+                        <option value="chisme">👀 Chisme</option>
+                        <option value="queja">😤 Queja</option>
+                        <option value="humor">😂 Humor</option>
+                        <option value="consejo">💡 Consejo</option>
+                    </select>
+                    <button class="btn btn-primary" id="btnPublish" onclick="createPost()">Publicar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="logged-out-message" id="loggedOutMessage">
+            <p>🔒 <strong>Regístrate para compartir tu marrón</strong> y unirte a la comunidad anónima de oficinas peruanas.</p>
+            <button class="btn btn-primary" onclick="openModal('registerModal')">Únete ahora</button>
+        </div>
+
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">🔥 Todos</button>
+            <button class="filter-tab" data-filter="chisme">👀 Chismes</button>
+            <button class="filter-tab" data-filter="queja">😤 Quejas</button>
+            <button class="filter-tab" data-filter="humor">😂 Humor</button>
+            <button class="filter-tab" data-filter="consejo">💡 Consejos</button>
+            <button class="filter-tab" data-filter="random">🎲 Random</button>
+        </div>
+
+        <div class="posts-container" id="postsContainer"><div class="loading"><div class="spinner"></div></div></div>
+        <div class="load-more" id="loadMore" style="display: none;"><button class="btn btn-secondary" onclick="loadMorePosts()">Cargar más</button></div>
+
+        <footer>
+            <p>Hecho con ☕ y algo de frustración laboral en Perú 🇵🇪</p>
+            <div class="footer-links"><a href="#">Reglas del foro</a><a href="#">Contacto</a><a href="#">Privacidad</a></div>
+        </footer>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal-overlay" id="registerModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('registerModal')">&times;</button>
+            <h2>¡Únete al Marrón!</h2>
+            <p>Solo necesitamos tu email para verificar que eres real. Tu identidad será completamente anónima.</p>
+            <div class="form-group">
+                <label>Email corporativo o personal</label>
+                <input type="email" id="registerEmail" placeholder="tu@email.com">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="btnSendRegisterOTP" onclick="sendRegisterOTP()">Enviar código de verificación</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTP Modal -->
+    <div class="modal-overlay" id="otpModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('otpModal')">&times;</button>
+            <h2>Verifica tu email</h2>
+            <p>Ingresa el código de 6 dígitos que enviamos a <strong id="otpEmailDisplay"></strong></p>
+            <div class="form-group">
+                <div class="otp-inputs" id="registerOtpInputs">
+                    <input type="text" class="otp-input" maxlength="1" data-index="0">
+                    <input type="text" class="otp-input" maxlength="1" data-index="1">
+                    <input type="text" class="otp-input" maxlength="1" data-index="2">
+                    <input type="text" class="otp-input" maxlength="1" data-index="3">
+                    <input type="text" class="otp-input" maxlength="1" data-index="4">
+                    <input type="text" class="otp-input" maxlength="1" data-index="5">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="btnVerifyRegisterOTP" onclick="verifyRegisterOTP()">Verificar</button>
+                <button class="btn btn-secondary" onclick="sendRegisterOTP()">Reenviar código</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('successModal'); renderUI();">&times;</button>
+            <div class="success-message">
+                <div class="success-icon">🎉</div>
+                <h2>¡Bienvenido/a!</h2>
+                <p>Tu identidad anónima es:</p>
+                <div class="username-reveal" id="newUsername"></div>
+                <p>Ahora puedes compartir todos tus marrones de oficina sin miedo. ¡Nadie sabrá quién eres!</p>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="closeModal('successModal'); renderUI();">¡Empezar a postear!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+            <h2>Inicia sesión</h2>
+            <p>Ingresa tu email registrado para recibir tu código de acceso.</p>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="tu@email.com">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="btnSendLoginOTP" onclick="sendLoginOTP()">Enviar código</button>
+                <p style="text-align: center; margin-top: 15px; color: var(--text-muted); font-size: 0.9rem;">
+                    ¿No tienes cuenta? <a href="#" onclick="closeModal('loginModal'); openModal('registerModal');" style="color: var(--accent-teal);">Regístrate</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login OTP Modal -->
+    <div class="modal-overlay" id="loginOtpModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('loginOtpModal')">&times;</button>
+            <h2>Código de acceso</h2>
+            <p>Ingresa el código de 6 dígitos que enviamos a <strong id="loginOtpEmailDisplay"></strong></p>
+            <div class="form-group">
+                <div class="otp-inputs" id="loginOtpInputs">
+                    <input type="text" class="otp-input" maxlength="1" data-index="0">
+                    <input type="text" class="otp-input" maxlength="1" data-index="1">
+                    <input type="text" class="otp-input" maxlength="1" data-index="2">
+                    <input type="text" class="otp-input" maxlength="1" data-index="3">
+                    <input type="text" class="otp-input" maxlength="1" data-index="4">
+                    <input type="text" class="otp-input" maxlength="1" data-index="5">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="btnVerifyLoginOTP" onclick="verifyLoginOTP()">Entrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============================================
+        // CONFIGURACIÓN - CAMBIAR EN PRODUCCIÓN
+        // ============================================
+        const API_URL = 'http://localhost:3000/api';
+        
+        let currentUser = null;
+        let currentPage = 1;
+        let currentFilter = 'all';
+        let hasMorePosts = false;
+        let pendingEmail = '';
+
+        // ============================================
+        // UTILIDADES
+        // ============================================
+        const getToken = () => localStorage.getItem('marron_token');
+        const setToken = (token) => localStorage.setItem('marron_token', token);
+        const clearToken = () => localStorage.removeItem('marron_token');
+        const getStoredUser = () => { const u = localStorage.getItem('marron_user'); return u ? JSON.parse(u) : null; };
+        const setStoredUser = (user) => localStorage.setItem('marron_user', JSON.stringify(user));
+        const clearStoredUser = () => localStorage.removeItem('marron_user');
+
+        async function apiCall(endpoint, options = {}) {
+            const token = getToken();
+            const headers = { 'Content-Type': 'application/json', ...(token && { 'Authorization': `Bearer ${token}` }) };
+            try {
+                const response = await fetch(`${API_URL}${endpoint}`, { ...options, headers: { ...headers, ...options.headers } });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Error en la solicitud');
+                return data;
+            } catch (error) {
+                if (error.message === 'Failed to fetch') throw new Error('No se puede conectar al servidor. Verifica que el backend esté corriendo.');
+                throw error;
+            }
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.toggle('error', isError);
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function formatTime(timestamp) {
+            const diff = Math.floor((new Date() - new Date(timestamp)) / 1000);
+            if (diff < 60) return 'Hace un momento';
+            if (diff < 3600) return `Hace ${Math.floor(diff / 60)} min`;
+            if (diff < 86400) return `Hace ${Math.floor(diff / 3600)} horas`;
+            if (diff < 604800) return `Hace ${Math.floor(diff / 86400)} días`;
+            return new Date(timestamp).toLocaleDateString('es-PE');
+        }
+
+        function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+        
+        const getCategoryLabel = (cat) => ({ chisme: '👀 Chisme', queja: '😤 Queja', humor: '😂 Humor', consejo: '💡 Consejo', random: '🎲 Random' }[cat] || '🎲 Random');
+        const openModal = (id) => document.getElementById(id).classList.add('active');
+        const closeModal = (id) => document.getElementById(id).classList.remove('active');
+
+        // OTP Navigation
+        document.querySelectorAll('.otp-input').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value.length === 1) {
+                    const next = this.closest('.otp-inputs').querySelector(`[data-index="${parseInt(this.dataset.index) + 1}"]`);
+                    if (next) next.focus();
+                }
+            });
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value === '') {
+                    const prev = this.closest('.otp-inputs').querySelector(`[data-index="${parseInt(this.dataset.index) - 1}"]`);
+                    if (prev) prev.focus();
+                }
+            });
+        });
+
+        const getOTPValue = (containerId) => Array.from(document.querySelectorAll(`#${containerId} .otp-input`)).map(i => i.value).join('');
+        const clearOTPInputs = (containerId) => document.querySelectorAll(`#${containerId} .otp-input`).forEach(input => input.value = '');
+
+        // ============================================
+        // AUTENTICACIÓN
+        // ============================================
+        async function sendRegisterOTP() {
+            const email = document.getElementById('registerEmail').value.trim();
+            if (!email || !email.includes('@')) { showToast('Por favor ingresa un email válido', true); return; }
+            const btn = document.getElementById('btnSendRegisterOTP');
+            btn.disabled = true; btn.textContent = 'Enviando...';
+            try {
+                const data = await apiCall('/auth/register/send-otp', { method: 'POST', body: JSON.stringify({ email }) });
+                pendingEmail = email;
+                closeModal('registerModal');
+                document.getElementById('otpEmailDisplay').textContent = email;
+                clearOTPInputs('registerOtpInputs');
+                openModal('otpModal');
+                showToast(data.message);
+                if (data.dev_otp) console.log('DEV OTP:', data.dev_otp);
+            } catch (error) { showToast(error.message, true); }
+            finally { btn.disabled = false; btn.textContent = 'Enviar código de verificación'; }
+        }
+
+        async function verifyRegisterOTP() {
+            const otp = getOTPValue('registerOtpInputs');
+            if (otp.length !== 6) { showToast('Ingresa el código completo', true); return; }
+            const btn = document.getElementById('btnVerifyRegisterOTP');
+            btn.disabled = true; btn.textContent = 'Verificando...';
+            try {
+                const data = await apiCall('/auth/register/verify-otp', { method: 'POST', body: JSON.stringify({ email: pendingEmail, otp }) });
+                setToken(data.token); setStoredUser(data.user); currentUser = data.user;
+                closeModal('otpModal');
+                document.getElementById('newUsername').textContent = data.user.username;
+                openModal('successModal');
+            } catch (error) { showToast(error.message, true); }
+            finally { btn.disabled = false; btn.textContent = 'Verificar'; }
+        }
+
+        async function sendLoginOTP() {
+            const email = document.getElementById('loginEmail').value.trim();
+            if (!email || !email.includes('@')) { showToast('Por favor ingresa un email válido', true); return; }
+            const btn = document.getElementById('btnSendLoginOTP');
+            btn.disabled = true; btn.textContent = 'Enviando...';
+            try {
+                const data = await apiCall('/auth/login/send-otp', { method: 'POST', body: JSON.stringify({ email }) });
+                pendingEmail = email;
+                closeModal('loginModal');
+                document.getElementById('loginOtpEmailDisplay').textContent = email;
+                clearOTPInputs('loginOtpInputs');
+                openModal('loginOtpModal');
+                showToast(data.message);
+                if (data.dev_otp) console.log('DEV OTP:', data.dev_otp);
+            } catch (error) { showToast(error.message, true); }
+            finally { btn.disabled = false; btn.textContent = 'Enviar código'; }
+        }
+
+        async function verifyLoginOTP() {
+            const otp = getOTPValue('loginOtpInputs');
+            if (otp.length !== 6) { showToast('Ingresa el código completo', true); return; }
+            const btn = document.getElementById('btnVerifyLoginOTP');
+            btn.disabled = true; btn.textContent = 'Entrando...';
+            try {
+                const data = await apiCall('/auth/login/verify-otp', { method: 'POST', body: JSON.stringify({ email: pendingEmail, otp }) });
+                setToken(data.token); setStoredUser(data.user); currentUser = data.user;
+                closeModal('loginOtpModal');
+                showToast(data.message);
+                renderUI();
+            } catch (error) { showToast(error.message, true); }
+            finally { btn.disabled = false; btn.textContent = 'Entrar'; }
+        }
+
+        function logout() { clearToken(); clearStoredUser(); currentUser = null; showToast('Sesión cerrada'); renderUI(); }
+
+        async function checkAuth() {
+            const token = getToken(), storedUser = getStoredUser();
+            if (!token || !storedUser) { currentUser = null; return; }
+            try { const data = await apiCall('/auth/me'); currentUser = data.user; setStoredUser(data.user); }
+            catch (error) { clearToken(); clearStoredUser(); currentUser = null; }
+        }
+
+        // ============================================
+        // POSTS
+        // ============================================
+        async function loadPosts(page = 1, filter = 'all', append = false) {
+            const container = document.getElementById('postsContainer');
+            if (!append) container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            try {
+                let endpoint = `/posts?page=${page}&limit=20`;
+                if (filter !== 'all') endpoint += `&category=${filter}`;
+                const data = await apiCall(endpoint);
+                if (!append) container.innerHTML = '';
+                if (data.data.posts.length === 0 && page === 1) {
+                    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>No hay marrones aún.<br>¡Sé el primero en compartir!</p></div>';
+                    document.getElementById('loadMore').style.display = 'none';
+                    return;
+                }
+                data.data.posts.forEach(post => container.innerHTML += renderPost(post));
+                hasMorePosts = data.data.pagination.hasMore;
+                currentPage = page;
+                document.getElementById('loadMore').style.display = hasMorePosts ? 'block' : 'none';
+            } catch (error) {
+                container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">😵</div><p>${error.message}</p><button class="btn btn-secondary" onclick="loadPosts()" style="margin-top: 15px;">Reintentar</button></div>`;
+            }
+        }
+
+        function renderPost(post) {
+            return `
+                <article class="post" data-id="${post.id}">
+                    <div class="post-header">
+                        <div class="post-author">
+                            <div class="author-avatar">${post.author.userNumber}</div>
+                            <div class="author-info">
+                                <span class="author-name">${post.author.username}</span>
+                                <span class="post-time">${formatTime(post.createdAt)}</span>
+                            </div>
+                        </div>
+                        <span class="post-category cat-${post.category}">${getCategoryLabel(post.category)}</span>
+                    </div>
+                    <div class="post-content">${escapeHtml(post.content)}</div>
+                    <div class="post-footer">
+                        <button class="post-action ${post.userLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">❤️ <span>${post.likesCount}</span></button>
+                        <button class="post-action" onclick="toggleReplyForm('${post.id}')">💬 <span>${post.repliesCount} respuestas</span></button>
+                    </div>
+                    <div class="replies-container" id="replies-${post.id}"></div>
+                    <div class="reply-form" id="replyForm-${post.id}" style="display: none;">
+                        <textarea id="replyText-${post.id}" placeholder="Escribe tu respuesta..." maxlength="1000"></textarea>
+                        <div class="reply-form-actions">
+                            <button class="btn btn-secondary" onclick="toggleReplyForm('${post.id}')">Cancelar</button>
+                            <button class="btn btn-primary" onclick="submitReply('${post.id}')">Responder</button>
+                        </div>
+                    </div>
+                </article>`;
+        }
+
+        const loadMorePosts = () => loadPosts(currentPage + 1, currentFilter, true);
+
+        async function createPost() {
+            if (!currentUser) { showToast('Debes iniciar sesión para publicar', true); return; }
+            const content = document.getElementById('newPostContent').value.trim();
+            if (content.length < 10) { showToast('El contenido debe tener al menos 10 caracteres', true); return; }
+            const category = document.getElementById('postCategory').value;
+            const btn = document.getElementById('btnPublish');
+            btn.disabled = true; btn.textContent = 'Publicando...';
+            try {
+                await apiCall('/posts', { method: 'POST', body: JSON.stringify({ content, category }) });
+                document.getElementById('newPostContent').value = '';
+                document.getElementById('charCount').textContent = '0';
+                showToast('¡Marrón publicado! 🎉');
+                loadPosts(1, currentFilter); loadStats();
+            } catch (error) { showToast(error.message, true); }
+            finally { btn.disabled = false; btn.textContent = 'Publicar'; }
+        }
+
+        async function toggleLike(postId) {
+            if (!currentUser) { showToast('Inicia sesión para dar like', true); return; }
+            try {
+                const data = await apiCall(`/posts/${postId}/like`, { method: 'POST' });
+                const postEl = document.querySelector(`[data-id="${postId}"]`);
+                const likeBtn = postEl.querySelector('.post-action');
+                likeBtn.classList.toggle('liked', data.data.liked);
+                likeBtn.querySelector('span').textContent = data.data.likesCount;
+            } catch (error) { showToast(error.message, true); }
+        }
+
+        async function toggleReplyForm(postId) {
+            if (!currentUser) { showToast('Inicia sesión para responder', true); return; }
+            const form = document.getElementById(`replyForm-${postId}`);
+            const repliesContainer = document.getElementById(`replies-${postId}`);
+            const isHidden = form.style.display === 'none';
+            form.style.display = isHidden ? 'block' : 'none';
+            if (isHidden && repliesContainer.innerHTML === '') await loadReplies(postId);
+        }
+
+        async function loadReplies(postId) {
+            const container = document.getElementById(`replies-${postId}`);
+            try {
+                const data = await apiCall(`/posts/${postId}`);
+                if (data.data.replies.length > 0) {
+                    container.innerHTML = data.data.replies.map(reply => `
+                        <div class="reply">
+                            <div class="post-author">
+                                <div class="author-avatar">${reply.author.userNumber}</div>
+                                <div class="author-info">
+                                    <span class="author-name">${reply.author.username}</span>
+                                    <span class="post-time">${formatTime(reply.createdAt)}</span>
+                                </div>
+                            </div>
+                            <div class="post-content">${escapeHtml(reply.content)}</div>
+                        </div>`).join('');
+                }
+            } catch (error) { console.error('Error loading replies:', error); }
+        }
+
+        async function submitReply(postId) {
+            const textarea = document.getElementById(`replyText-${postId}`);
+            const content = textarea.value.trim();
+            if (content.length < 5) { showToast('La respuesta debe tener al menos 5 caracteres', true); return; }
+            try {
+                await apiCall(`/posts/${postId}/replies`, { method: 'POST', body: JSON.stringify({ content }) });
+                textarea.value = '';
+                showToast('Respuesta publicada');
+                await loadReplies(postId);
+                const postEl = document.querySelector(`[data-id="${postId}"]`);
+                const replyBtn = postEl.querySelectorAll('.post-action')[1];
+                const currentCount = parseInt(replyBtn.querySelector('span').textContent);
+                replyBtn.querySelector('span').textContent = `${currentCount + 1} respuestas`;
+                loadStats();
+            } catch (error) { showToast(error.message, true); }
+        }
+
+        async function loadStats() {
+            try {
+                const data = await apiCall('/posts/stats/summary');
+                document.getElementById('totalPosts').textContent = data.data.totalPosts;
+                document.getElementById('totalUsers').textContent = data.data.totalUsers;
+                document.getElementById('totalReplies').textContent = data.data.totalReplies;
+            } catch (error) { console.error('Error loading stats:', error); }
+        }
+
+        function renderUserBar() {
+            const userBar = document.getElementById('userBar');
+            const newPostSection = document.getElementById('newPostSection');
+            const loggedOutMessage = document.getElementById('loggedOutMessage');
+            if (currentUser) {
+                userBar.innerHTML = `<div class="user-badge">${currentUser.username}</div><button class="btn btn-logout" onclick="logout()">Cerrar sesión</button>`;
+                newPostSection.style.display = 'block';
+                loggedOutMessage.style.display = 'none';
+            } else {
+                userBar.innerHTML = `<button class="btn btn-secondary" onclick="openModal('loginModal')">Iniciar sesión</button><button class="btn btn-primary" onclick="openModal('registerModal')">Registrarse</button>`;
+                newPostSection.style.display = 'none';
+                loggedOutMessage.style.display = 'block';
+            }
+        }
+
+        function renderUI() { renderUserBar(); loadPosts(1, currentFilter); loadStats(); }
+
+        document.getElementById('newPostContent').addEventListener('input', function() { document.getElementById('charCount').textContent = this.value.length; });
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                currentPage = 1;
+                loadPosts(1, currentFilter);
+            });
+        });
+
+        // INIT
+        (async function init() { await checkAuth(); renderUI(); })();
+    </script>
+</body>
+</html>
