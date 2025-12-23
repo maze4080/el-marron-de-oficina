@@ -340,7 +340,7 @@
 
     <script>
         // ============================================
-        // CONFIGURACIÓN - CAMBIAR EN PRODUCCIÓN
+        // CONFIGURACIÓN
         // ============================================
         const API_URL = 'https://el-marron-de-oficina-production.up.railway.app/api';
         
@@ -369,7 +369,7 @@
                 if (!response.ok) throw new Error(data.message || 'Error en la solicitud');
                 return data;
             } catch (error) {
-                if (error.message === 'Failed to fetch') throw new Error('No se puede conectar al servidor. Verifica que el backend esté corriendo.');
+                if (error.message === 'Failed to fetch') throw new Error('No se puede conectar al servidor.');
                 throw error;
             }
         }
@@ -432,7 +432,6 @@
                 clearOTPInputs('registerOtpInputs');
                 openModal('otpModal');
                 showToast(data.message);
-                if (data.dev_otp) console.log('DEV OTP:', data.dev_otp);
             } catch (error) { showToast(error.message, true); }
             finally { btn.disabled = false; btn.textContent = 'Enviar código de verificación'; }
         }
@@ -465,7 +464,6 @@
                 clearOTPInputs('loginOtpInputs');
                 openModal('loginOtpModal');
                 showToast(data.message);
-                if (data.dev_otp) console.log('DEV OTP:', data.dev_otp);
             } catch (error) { showToast(error.message, true); }
             finally { btn.disabled = false; btn.textContent = 'Enviar código'; }
         }
@@ -584,7 +582,9 @@
             const repliesContainer = document.getElementById(`replies-${postId}`);
             const isHidden = form.style.display === 'none';
             form.style.display = isHidden ? 'block' : 'none';
-            if (isHidden && repliesContainer.innerHTML === '') await loadReplies(postId);
+            if (isHidden && repliesContainer.innerHTML === '') {
+                await loadReplies(postId);
+            }
         }
 
         async function loadReplies(postId) {
@@ -604,28 +604,9 @@
                             <div class="post-content">${escapeHtml(reply.content)}</div>
                         </div>`).join('');
                     
-                    // Actualizar contador de respuestas
                     const postEl = document.querySelector(`[data-id="${postId}"]`);
                     const replyBtn = postEl.querySelectorAll('.post-action')[1];
                     replyBtn.querySelector('span').textContent = `${data.data.replies.length} respuestas`;
-                }
-            } catch (error) { console.error('Error loading replies:', error); }
-        }
-            const container = document.getElementById(`replies-${postId}`);
-            try {
-                const data = await apiCall(`/posts/${postId}`);
-                if (data.data.replies.length > 0) {
-                    container.innerHTML = data.data.replies.map(reply => `
-                        <div class="reply">
-                            <div class="post-author">
-                                <div class="author-avatar">${reply.author.userNumber}</div>
-                                <div class="author-info">
-                                    <span class="author-name">${reply.author.username}</span>
-                                    <span class="post-time">${formatTime(reply.createdAt)}</span>
-                                </div>
-                            </div>
-                            <div class="post-content">${escapeHtml(reply.content)}</div>
-                        </div>`).join('');
                 }
             } catch (error) { console.error('Error loading replies:', error); }
         }
@@ -639,10 +620,6 @@
                 textarea.value = '';
                 showToast('Respuesta publicada');
                 await loadReplies(postId);
-                const postEl = document.querySelector(`[data-id="${postId}"]`);
-                const replyBtn = postEl.querySelectorAll('.post-action')[1];
-                const currentCount = parseInt(replyBtn.querySelector('span').textContent);
-                replyBtn.querySelector('span').textContent = `${currentCount + 1} respuestas`;
                 loadStats();
             } catch (error) { showToast(error.message, true); }
         }
@@ -659,33 +636,6 @@
         function renderUserBar() {
             const userBar = document.getElementById('userBar');
             const newPostSection = document.getElementById('newPostSection');
-            const loggedOutMessage = document.getElementById('loggedOutMessage');
-            if (currentUser) {
-                userBar.innerHTML = `<div class="user-badge">${currentUser.username}</div><button class="btn btn-logout" onclick="logout()">Cerrar sesión</button>`;
-                newPostSection.style.display = 'block';
-                loggedOutMessage.style.display = 'none';
-            } else {
-                userBar.innerHTML = `<button class="btn btn-secondary" onclick="openModal('loginModal')">Iniciar sesión</button><button class="btn btn-primary" onclick="openModal('registerModal')">Registrarse</button>`;
-                newPostSection.style.display = 'none';
-                loggedOutMessage.style.display = 'block';
-            }
-        }
-
-        function renderUI() { renderUserBar(); loadPosts(1, currentFilter); loadStats(); }
-
-        document.getElementById('newPostContent').addEventListener('input', function() { document.getElementById('charCount').textContent = this.value.length; });
-        document.querySelectorAll('.filter-tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                currentFilter = this.dataset.filter;
-                currentPage = 1;
-                loadPosts(1, currentFilter);
-            });
-        });
-
-        // INIT
-        (async function init() { await checkAuth(); renderUI(); })();
-    </script>
+            const loggedO
 </body>
 </html>
