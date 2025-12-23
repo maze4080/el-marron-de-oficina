@@ -1,7 +1,5 @@
 /**
  * EL MARRÓN DE OFICINA - Backend Server
- * =====================================
- * API REST para el foro anónimo de oficinas peruanas
  */
 
 require('dotenv').config();
@@ -16,18 +14,17 @@ const postsRoutes = require('./routes/posts');
 
 // Crear aplicación Express
 const app = express();
-app.set('trust proxy', 1);
+const PORT = process.env.PORT || 3000;
 
-// ===========================================
-// MIDDLEWARES DE SEGURIDAD
-// ===========================================
+// Trust proxy (necesario para Railway)
+app.set('trust proxy', 1);
 
 // Helmet para headers de seguridad
 app.use(helmet());
 
 // CORS
 app.use(cors({
-    origin: process.env.FRONTEND_URL || '*',
+    origin: '*',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -35,8 +32,8 @@ app.use(cors({
 
 // Rate limiting general
 const limiter = rateLimit({
-    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutos
-    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+    windowMs: 15 * 60 * 1000,
+    max: 100,
     message: {
         success: false,
         message: 'Demasiadas solicitudes, intenta de nuevo más tarde'
@@ -46,37 +43,25 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Rate limiting más estricto para autenticación
+// Rate limiting para autenticación
 const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 10, // máximo 10 intentos por IP
+    windowMs: 15 * 60 * 1000,
+    max: 10,
     message: {
         success: false,
         message: 'Demasiados intentos de autenticación, intenta en 15 minutos'
     }
 });
 
-// ===========================================
-// MIDDLEWARES DE PARSING
-// ===========================================
-
-app.use(express.json({ limit: '10kb' })); // Limitar tamaño de body
+// Middlewares de parsing
+app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
-// ===========================================
-// LOGGING (desarrollo)
-// ===========================================
-
-if (process.env.NODE_ENV !== 'production') {
-    app.use((req, res, next) => {
-        console.log(`${new Date().toISOString()} | ${req.method} ${req.path}`);
-        next();
-    });
-}
-
-// ===========================================
-// RUTAS DE LA API
-// ===========================================
+// Logging
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} | ${req.method} ${req.path}`);
+    next();
+});
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -87,15 +72,9 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// Rutas de autenticación (con rate limiting adicional)
+// Rutas
 app.use('/api/auth', authLimiter, authRoutes);
-
-// Rutas de posts
 app.use('/api/posts', postsRoutes);
-
-// ===========================================
-// MANEJO DE ERRORES
-// ===========================================
 
 // Ruta no encontrada
 app.use((req, res) => {
@@ -105,34 +84,22 @@ app.use((req, res) => {
     });
 });
 
-// Error handler global
+// Error handler
 app.use((err, req, res, next) => {
-    console.error('Error no manejado:', err);
-    
-    // No revelar detalles en producción
-    const message = process.env.NODE_ENV === 'production' 
-        ? 'Error interno del servidor' 
-        : err.message;
-
+    console.error('Error:', err);
     res.status(err.status || 500).json({
         success: false,
-        message,
-        ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
+        message: 'Error interno del servidor'
     });
 });
 
-// ===========================================
-// INICIAR SERVIDOR
-// ===========================================
-
+// Iniciar servidor
 app.listen(PORT, () => {
     console.log('');
     console.log('═══════════════════════════════════════════════════════════');
     console.log('   ☕ EL MARRÓN DE OFICINA - Backend API');
     console.log('═══════════════════════════════════════════════════════════');
-    console.log(`   🚀 Servidor corriendo en: http://localhost:${PORT}`);
-    console.log(`   📡 API disponible en: http://localhost:${PORT}/api`);
-    console.log(`   🔧 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`   🚀 Servidor corriendo en puerto: ${PORT}`);
     console.log('═══════════════════════════════════════════════════════════');
     console.log('');
 });
