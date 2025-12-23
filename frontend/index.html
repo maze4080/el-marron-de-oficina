@@ -603,6 +603,29 @@
                             </div>
                             <div class="post-content">${escapeHtml(reply.content)}</div>
                         </div>`).join('');
+                    
+                    // Actualizar contador de respuestas
+                    const postEl = document.querySelector(`[data-id="${postId}"]`);
+                    const replyBtn = postEl.querySelectorAll('.post-action')[1];
+                    replyBtn.querySelector('span').textContent = `${data.data.replies.length} respuestas`;
+                }
+            } catch (error) { console.error('Error loading replies:', error); }
+        }
+            const container = document.getElementById(`replies-${postId}`);
+            try {
+                const data = await apiCall(`/posts/${postId}`);
+                if (data.data.replies.length > 0) {
+                    container.innerHTML = data.data.replies.map(reply => `
+                        <div class="reply">
+                            <div class="post-author">
+                                <div class="author-avatar">${reply.author.userNumber}</div>
+                                <div class="author-info">
+                                    <span class="author-name">${reply.author.username}</span>
+                                    <span class="post-time">${formatTime(reply.createdAt)}</span>
+                                </div>
+                            </div>
+                            <div class="post-content">${escapeHtml(reply.content)}</div>
+                        </div>`).join('');
                 }
             } catch (error) { console.error('Error loading replies:', error); }
         }
