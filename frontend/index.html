@@ -259,7 +259,7 @@
             <button class="modal-close" onclick="closeModal('otpModal')">&times;</button>
             <h2>Verifica tu email</h2>
             <p>Ingresa el código de 6 dígitos que enviamos a <strong id="otpEmailDisplay"></strong></p>
-<p style="font-size: 0.85rem; color: #ff6b35; margin-top: 10px;">📬 ¿No lo ves? Revisa tu carpeta de spam, a veces el código se esconde ahí 👀</p>
+            <p style="font-size: 0.85rem; color: #ff6b35; margin-top: 10px;">📬 ¿No lo ves? Revisa tu carpeta de spam, a veces el código se esconde ahí 👀</p>
             <div class="form-group">
                 <div class="otp-inputs" id="registerOtpInputs">
                     <input type="text" class="otp-input" maxlength="1" data-index="0">
@@ -319,7 +319,7 @@
             <button class="modal-close" onclick="closeModal('loginOtpModal')">&times;</button>
             <h2>Código de acceso</h2>
             <p>Ingresa el código de 6 dígitos que enviamos a <strong id="loginOtpEmailDisplay"></strong></p>
-<p style="font-size: 0.85rem; color: #ff6b35; margin-top: 10px;">📬 ¿No lo ves? Revisa tu carpeta de spam, a veces el código se esconde ahí 👀</p>
+            <p style="font-size: 0.85rem; color: #ff6b35; margin-top: 10px;">📬 ¿No lo ves? Revisa tu carpeta de spam, a veces el código se esconde ahí 👀</p>
             <div class="form-group">
                 <div class="otp-inputs" id="loginOtpInputs">
                     <input type="text" class="otp-input" maxlength="1" data-index="0">
@@ -339,20 +339,13 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // ============================================
-        // CONFIGURACIÓN
-        // ============================================
         const API_URL = 'https://el-marron-de-oficina-production.up.railway.app/api';
-        
         let currentUser = null;
         let currentPage = 1;
         let currentFilter = 'all';
         let hasMorePosts = false;
         let pendingEmail = '';
 
-        // ============================================
-        // UTILIDADES
-        // ============================================
         const getToken = () => localStorage.getItem('marron_token');
         const setToken = (token) => localStorage.setItem('marron_token', token);
         const clearToken = () => localStorage.removeItem('marron_token');
@@ -392,12 +385,10 @@
         }
 
         function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-        
         const getCategoryLabel = (cat) => ({ chisme: '👀 Chisme', queja: '😤 Queja', humor: '😂 Humor', consejo: '💡 Consejo', random: '🎲 Random' }[cat] || '🎲 Random');
         const openModal = (id) => document.getElementById(id).classList.add('active');
         const closeModal = (id) => document.getElementById(id).classList.remove('active');
 
-        // OTP Navigation
         document.querySelectorAll('.otp-input').forEach(input => {
             input.addEventListener('input', function() {
                 if (this.value.length === 1) {
@@ -416,9 +407,6 @@
         const getOTPValue = (containerId) => Array.from(document.querySelectorAll(`#${containerId} .otp-input`)).map(i => i.value).join('');
         const clearOTPInputs = (containerId) => document.querySelectorAll(`#${containerId} .otp-input`).forEach(input => input.value = '');
 
-        // ============================================
-        // AUTENTICACIÓN
-        // ============================================
         async function sendRegisterOTP() {
             const email = document.getElementById('registerEmail').value.trim();
             if (!email || !email.includes('@')) { showToast('Por favor ingresa un email válido', true); return; }
@@ -492,9 +480,6 @@
             catch (error) { clearToken(); clearStoredUser(); currentUser = null; }
         }
 
-        // ============================================
-        // POSTS
-        // ============================================
         async function loadPosts(page = 1, filter = 'all', append = false) {
             const container = document.getElementById('postsContainer');
             if (!append) container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
@@ -603,7 +588,6 @@
                             </div>
                             <div class="post-content">${escapeHtml(reply.content)}</div>
                         </div>`).join('');
-                    
                     const postEl = document.querySelector(`[data-id="${postId}"]`);
                     const replyBtn = postEl.querySelectorAll('.post-action')[1];
                     replyBtn.querySelector('span').textContent = `${data.data.replies.length} respuestas`;
@@ -636,6 +620,32 @@
         function renderUserBar() {
             const userBar = document.getElementById('userBar');
             const newPostSection = document.getElementById('newPostSection');
-            const loggedO
+            const loggedOutMessage = document.getElementById('loggedOutMessage');
+            if (currentUser) {
+                userBar.innerHTML = `<div class="user-badge">${currentUser.username}</div><button class="btn btn-logout" onclick="logout()">Cerrar sesión</button>`;
+                newPostSection.style.display = 'block';
+                loggedOutMessage.style.display = 'none';
+            } else {
+                userBar.innerHTML = `<button class="btn btn-secondary" onclick="openModal('loginModal')">Iniciar sesión</button><button class="btn btn-primary" onclick="openModal('registerModal')">Registrarse</button>`;
+                newPostSection.style.display = 'none';
+                loggedOutMessage.style.display = 'block';
+            }
+        }
+
+        function renderUI() { renderUserBar(); loadPosts(1, currentFilter); loadStats(); }
+
+        document.getElementById('newPostContent').addEventListener('input', function() { document.getElementById('charCount').textContent = this.value.length; });
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                currentPage = 1;
+                loadPosts(1, currentFilter);
+            });
+        });
+
+        (async function init() { await checkAuth(); renderUI(); })();
+    </script>
 </body>
 </html>
