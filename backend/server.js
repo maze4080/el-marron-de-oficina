@@ -16,7 +16,7 @@ const postsRoutes = require('./routes/posts');
 
 // Crear aplicación Express
 const app = express();
-const PORT = process.env.PORT || 3000;
+app.set('trust proxy', 1);
 
 // ===========================================
 // MIDDLEWARES DE SEGURIDAD
