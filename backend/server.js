@@ -75,7 +75,46 @@ app.get('/api/health', (req, res) => {
 // Rutas
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/posts', postsRoutes);
-
+// Ruta temporal para arreglar contadores (eliminar después de usar)
+app.get('/api/fix-replies', async (req, res) => {
+    const pool = require('./config/database');
+    try {
+        await pool.query(`
+            CREATE OR REPLACE FUNCTION update_replies_count()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                IF TG_OP = 'INSERT' THEN
+                    UPDATE posts SET replies_count = replies_count + 1 WHERE id = NEW.post_id;
+                    RETURN NEW;
+                ELSIF TG_OP = 'DELETE' THEN
+                    UPDATE posts SET replies_count = replies_count - 1 WHERE id = OLD.post_id;
+                    RETURN OLD;
+                ELSIF TG_OP = 'UPDATE' AND OLD.is_deleted = false AND NEW.is_deleted = true THEN
+                    UPDATE posts SET replies_count = replies_count - 1 WHERE id = NEW.post_id;
+                    RETURN NEW;
+                END IF;
+                RETURN NULL;
+            END;
+            $$ LANGUAGE plpgsql;
+        `);
+        await pool.query('DROP TRIGGER IF EXISTS trigger_update_replies_count ON replies;');
+        await pool.query(`
+            CREATE TRIGGER trigger_update_replies_count
+            AFTER INSERT OR DELETE OR UPDATE OF is_deleted ON replies
+            FOR EACH ROW
+            EXECUTE FUNCTION update_replies_count();
+        `);
+        await pool.query(`
+            UPDATE posts SET replies_count = (
+                SELECT COUNT(*) FROM replies 
+                WHERE replies.post_id = posts.id AND replies.is_deleted = false
+            );
+        `);
+        res.json({ success: true, message: 'Contadores arreglados!' });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
 // Ruta no encontrada
 app.use((req, res) => {
     res.status(404).json({
